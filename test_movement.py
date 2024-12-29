@@ -17,9 +17,11 @@ def rotate(x):
     # 3 = 360
     # 1.5 = 180
     # .75  = 90
-    
+
     autoit.send("{RIGHT Down}")
     time.sleep(x)
     autoit.send("{RIGHT Up}")
 time.sleep(1)
-rotate(.75)
+#rotate(3)
+
+move_to(500,500)
