@@ -6,6 +6,7 @@ import numpy as np
 
 
 def green_mask(image):
+    #remove all colors except for range of green colors from image
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv,(45, 100, 20), (80, 255, 255) )
     #cv2.imshow("GREEN", mask);cv2.waitKey();cv2.destroyAllWindows()
@@ -18,6 +19,9 @@ def get_hills(before, after):
     cv2.imshow("After", after_mask);cv2.waitKey();cv2.destroyAllWindows()
     new_green_features = cv2.subtract(after_mask, before_mask)
     cv2.imshow('NEW', new_green_features);cv2.waitKey();cv2.destroyAllWindows()
+
+    #show before, after image
+    #show after - before to get possible hills
     return new_green_features
 
 def largest_hill(hills):
@@ -43,6 +47,9 @@ def largest_hill(hills):
             temp[pixel_x][pixel_y] = len(current_hill)
         return temp
     
+    def remove_islands(hills, current_hill):
+        for x,y in current_hill:
+            hills[x][y] = 0
     seen = set()
     temp = np.zeros((len(hills), len(hills[0])))
     #255 = valid pixel
@@ -50,8 +57,11 @@ def largest_hill(hills):
         for j in range(len(hills[0])):
             if hills[i][j] == 255 and (i,j) not in seen:
                 current_hill = find_hill_size(i,j)
-                if len(current_hill) > 0:
+                if len(current_hill) > 1000:
                     print(len(current_hill))
+                else:
+                    remove_islands(hills, current_hill)
+                    #if island size too small in pixels black it out
                 temp = populate_arr(current_hill, temp)
     return temp
 
@@ -67,7 +77,7 @@ green_mask = get_hills(img3, img1)
 print('before')
 
 temp = largest_hill(green_mask)
-
+cv2.imshow('NEW', green_mask);cv2.waitKey();cv2.destroyAllWindows()
 #print(temp)
 def compare_images(img1,img2):
     pass
