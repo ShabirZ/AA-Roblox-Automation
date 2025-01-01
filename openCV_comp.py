@@ -24,28 +24,36 @@ def largest_hill(hills):
     # this function is basically largest island on leetcode
     # however I make it so I return all pixels in the largest Island so i can pick multiple pixels
     def isValidPixel(i,j):
-        return 0<=i < len(hills) and 0<= j < len(hills[0]) and hills[i][j] == 255
-    def find_hill_size(i,j,root_x,root_y):
-        size = 0
+        return 0<=i < len(hills) and 0<= j < len(hills[0]) and hills[i][j] == 255 and (i,j) not in seen
+    def find_hill_size(i,j):
+        stack = [(i,j)]
         axis = [(1,0), (0,1), (-1,0), (0,-1)]
-        root_vals[(i,j)] = (root_x,root_y)
-        for x,y in axis:
-            r,c = i+x, j+y
-            if isValidPixel(r,c):
-                size += find_hill_size(r,c, root_x, root_y) + 1
-                seen.add((r,c))
-        return size
+        current_hill = []
+        while stack:
+            x,y = stack.pop()
+            for x_delta, y_delta in axis:
+                r,c = x+x_delta, y+ y_delta
+                if isValidPixel(r,c):
+                    stack.append([r,c])
+                    seen.add((r,c))
+                    current_hill.append((r,c))
+        return current_hill
+    def populate_arr(current_hill, temp):
+        for pixel_x, pixel_y in current_hill:
+            temp[pixel_x][pixel_y] = len(current_hill)
+        return temp
+    
     seen = set()
-    root_val = {}
-    island_size = {}
+    temp = np.zeros((len(hills), len(hills[0])))
     #255 = valid pixel
     for i in range(len(hills)):
         for j in range(len(hills[0])):
             if hills[i][j] == 255 and (i,j) not in seen:
-                island_size[(i,j)] = find_hill_size(i,j,i,j)
-            else:
-                island_size[(i,j)] = island_size[root_val[(i,j)]]
-    return island_size
+                current_hill = find_hill_size(i,j)
+                if len(current_hill) > 0:
+                    print(len(current_hill))
+                temp = populate_arr(current_hill, temp)
+    return temp
 
 images_dir = 'snow_inf_test_img'
 # Specific image paths
@@ -54,10 +62,13 @@ image2_path = "snow_inf_test_img\pre_hill_test_v2.PNG"
 image3_path = "snow_inf_test_img\pre_hill_test.PNG"
 
 img1,img2,img3 = cv2.imread(image1_path), cv2.imread(image2_path),  cv2.imread(image3_path)
+print('AAAAAAAAA')
+green_mask = get_hills(img3, img1) 
+print('before')
 
-get_hills(img3, img1)
+temp = largest_hill(green_mask)
 
-    
+#print(temp)
 def compare_images(img1,img2):
     pass
     """
