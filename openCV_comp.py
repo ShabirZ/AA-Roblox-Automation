@@ -20,6 +20,33 @@ def get_hills(before, after):
     cv2.imshow('NEW', new_green_features);cv2.waitKey();cv2.destroyAllWindows()
     return new_green_features
 
+def largest_hill(hills):
+    # this function is basically largest island on leetcode
+    # however I make it so I return all pixels in the largest Island so i can pick multiple pixels
+    def isValidPixel(i,j):
+        return 0<=i < len(hills) and 0<= j < len(hills[0]) and hills[i][j] == 255
+    def find_hill_size(i,j,root_x,root_y):
+        size = 0
+        axis = [(1,0), (0,1), (-1,0), (0,-1)]
+        root_vals[(i,j)] = (root_x,root_y)
+        for x,y in axis:
+            r,c = i+x, j+y
+            if isValidPixel(r,c):
+                size += find_hill_size(r,c, root_x, root_y) + 1
+                seen.add((r,c))
+        return size
+    seen = set()
+    root_val = {}
+    island_size = {}
+    #255 = valid pixel
+    for i in range(len(hills)):
+        for j in range(len(hills[0])):
+            if hills[i][j] == 255 and (i,j) not in seen:
+                island_size[(i,j)] = find_hill_size(i,j,i,j)
+            else:
+                island_size[(i,j)] = island_size[root_val[(i,j)]]
+    return island_size
+
 images_dir = 'snow_inf_test_img'
 # Specific image paths
 image1_path = "snow_inf_test_img\post_hill_test.PNG"
