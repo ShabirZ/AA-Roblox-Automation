@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+import time # meant for benchmarking
+
 #from WindowCapture import windowcapture
 
 #robloxCapture = WindowCapture('Roblox')
@@ -9,6 +11,13 @@ def green_mask(image):
     #remove all colors except for range of green colors from image
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv,(45, 100, 20), (80, 255, 255) )
+    #cv2.imshow("GREEN", mask);cv2.waitKey();cv2.destroyAllWindows()
+    return mask
+
+def red_mask(image):
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    #mask = cv2.inRange(hsv,(0, 100, 20), (15, 250, 255) )
+    mask = cv2.inRange(hsv,(155, 100, 20), (180, 255, 255) )
     #cv2.imshow("GREEN", mask);cv2.waitKey();cv2.destroyAllWindows()
     return mask
 
@@ -22,6 +31,9 @@ def get_hills(before, after):
 
     #show before, after image
     #show after - before to get possible hills
+
+    #look into bitwise not instead of this (may save computation?)
+    #https://stackoverflow.com/questions/59012898/filter-out-everything-of-a-certain-color-using-opencv
     return new_green_features
 
 def largest_hill(hills):
@@ -63,6 +75,9 @@ def largest_hill(hills):
                     remove_islands(hills, current_hill)
                     #if island size too small in pixels black it out
                 temp = populate_arr(current_hill, temp)
+    
+    #right now this function updates the current image and deletes small clumps
+    #thinking of making array of large clumps (like a heap that points to clump to put unit on largest clump)
     return temp
 
 images_dir = 'snow_inf_test_img'
@@ -75,31 +90,10 @@ img1,img2,img3 = cv2.imread(image1_path), cv2.imread(image2_path),  cv2.imread(i
 print('AAAAAAAAA')
 green_mask = get_hills(img3, img1) 
 print('before')
+temp = largest_hill(green_mask) # takes .6 seconds to run (can optomize by shrinking screen to only look at middle)
+cv2.imshow('NEW', temp);cv2.waitKey();cv2.destroyAllWindows()
 
-temp = largest_hill(green_mask)
-cv2.imshow('NEW', green_mask);cv2.waitKey();cv2.destroyAllWindows()
-#print(temp)
-def compare_images(img1,img2):
-    pass
-    """
-    Image Comparison:
-        img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-        img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
-        img2 = cv2.resize(img2, (img1.shape[1], img1.shape[0]))
-        #cv2.imshow("Computer Vision". pre_click)
-        #cv.imshow("Computer Vision". post_click)
-        h, w = img1.shape
-        def mse(img1, img2):
-            h, w = img1.shape
-            diff = cv2.subtract(img1, img2)
-            err = np.sum(diff**2)
-            mse = err/(float(h*w))
-            return mse, diff
 
-        error, diff = mse(img1, img2)
-        print("Image matching Error between the two images:",error)
-
-        cv2.imshow("difference", diff)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-    """
+print('RED')
+red = red_mask(img2)
+cv2.imshow('RED', red);cv2.waitKey();cv2.destroyAllWindows()
