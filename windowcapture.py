@@ -1,7 +1,7 @@
 import numpy as np
 import win32gui, win32ui, win32con
 
-
+#Note: possible option to add zoomed in screenshot to check bubbles to see if unt is valid to place
 class WindowCapture:
 
     # properties
@@ -73,15 +73,6 @@ class WindowCapture:
         img = np.ascontiguousarray(img)
 
         return img
-
-    # find the name of the window you're interested in.
-    # once you have it, update window_capture()
-    # https://stackoverflow.com/questions/55547940/how-to-get-a-list-of-the-name-of-every-open-window
-    def list_window_names(self):
-        def winEnumHandler(hwnd, ctx):
-            if win32gui.IsWindowVisible(hwnd):
-                print(hex(hwnd), win32gui.GetWindowText(hwnd))
-        win32gui.EnumWindows(winEnumHandler, None)
 
     # translate a pixel position on a screenshot image to a pixel position on the screen.
     # pos = (x, y)

@@ -2,14 +2,10 @@ import cv2
 import numpy as np
 import time # meant for benchmarking
 
-#from WindowCapture import windowcapture
-
-#robloxCapture = WindowCapture('Roblox')
-
 class imageMask:
     def __init__(self, img):
         self.img = img
-        
+
     def green_mask(self):
         #remove all colors except for range of green colors from image
         hsv = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
