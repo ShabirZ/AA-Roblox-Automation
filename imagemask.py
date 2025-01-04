@@ -14,7 +14,7 @@ class imageMask:
 
     def red_mask(self):
         hsv = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
-        self.img = cv2.inRange(hsv,(150, 100, 20), (180, 255, 255) )
+        self.img = cv2.inRange(hsv,(120, 100, 20), (180, 255, 255) )
         #cv2.imshow("GREEN", mask);cv2.waitKey();cv2.destroyAllWindows()
     
     @staticmethod
