@@ -64,6 +64,7 @@ class imageMask:
         seen = set()
         temp = np.zeros((len(self.img), len(self.img[0])))
         #255 = valid pixel
+        largest = -1
         for i in range(len(self.img)):
             for j in range(len(self.img[0])):
                 if self.img[i][j] == 255 and (i,j) not in seen:
@@ -71,11 +72,12 @@ class imageMask:
                     if len(current_hill) < 1000:
                         remove_islands(self.img, current_hill)
                         #if island size too small in pixels black it out
+                    largest = max(largest, len(current_hill))
         
         #right now this function updates the current image and deletes small clumps
         #thinking of making array of large clumps (like a heap that points to clump to put unit on largest clump)
         # looks better visually, bad in terms of speed i think
-        return self.img
+        return self.img, largest
 
 
 
@@ -113,4 +115,3 @@ def test():
     cv2.imshow('NEW', temp);cv2.waitKey();cv2.destroyAllWindows()
     cv2.imshow('NEW2', temp2);cv2.waitKey();cv2.destroyAllWindows()
     """
-test()

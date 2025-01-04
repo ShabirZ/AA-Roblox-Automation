@@ -118,4 +118,3 @@ def test():
         for template in template_imgs:
             print(in_image(img,template))
 """
-test2()
