@@ -4,67 +4,84 @@ from matplotlib import pyplot as plt
 import time
 
 
+class imageSearch:
+    def __init__(self, image):
+        self.image = image
+        self.methods = ['TM_CCOEFF_NORMED','TM_CCORR_NORMED']
 
-def in_image(img1, upgrade_img): 
+        upgrade_path = "snow_inf_test_img\\upgrade_img.PNG"
+        first_path = "snow_inf_test_img\\first_img.PNG"
+        upgrade_img = cv2.imread(upgrade_path, cv2.IMREAD_GRAYSCALE)
+        first_img = cv2.imread(first_path, cv2.IMREAD_GRAYSCALE)
+        self.template_imgs = [upgrade_img, first_img]
 
-    def draw_template_box(method):
+    def crop_image(self, img):
 
-        # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
-        if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
-            top_left = min_loc
-        else:
-            top_left = max_loc
-        bottom_right = (top_left[0] + w, top_left[1] + h)
-    
-        cv2.rectangle(img,top_left, bottom_right, 255, 2)
-        plt.subplot(121),plt.imshow(res,cmap = 'gray')
-        plt.title('Matching Result'), plt.xticks([]), plt.yticks([])
-        plt.subplot(122),plt.imshow(img,cmap = 'gray')
-        plt.title('Detected Point'), plt.xticks([]), plt.yticks([])
-        plt.suptitle(meth)
-    
-        plt.show()
+        height, width = img.shape
+        top_crop = int(height * 0.2)  # Top 20%
+        bottom_crop = int(height * 0.8)  # Bottom 80%
+        # Cut the image in half vertically
+        img2 = img[top_crop:bottom_crop, : width // 3]
+        return img2
 
-    img = img1
+    def in_image(self): 
 
-    template = upgrade_img
+        def draw_template_box(self,method):
 
+            # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
+            if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
+                top_left = min_loc
+            else:
+                top_left = max_loc
+            bottom_right = (top_left[0] + w, top_left[1] + h)
+        
+            cv2.rectangle(img,top_left, bottom_right, 255, 2)
+            plt.subplot(121),plt.imshow(res,cmap = 'gray')
+            plt.title('Matching Result'), plt.xticks([]), plt.yticks([])
+            plt.subplot(122),plt.imshow(img,cmap = 'gray')
+            plt.title('Detected Point'), plt.xticks([]), plt.yticks([])
+            plt.suptitle(meth)
+        
+            plt.show()
 
-    w, h = template.shape[::-1]
-    
-    # All the 6 methods for comparison in a list
-    methods = ['TM_CCOEFF_NORMED','TM_CCORR_NORMED']
-    flag = 0
+        img = self.image
+        img2 = self.crop_image(img)
+        cv2.imshow('NEW', img2);cv2.waitKey();cv2.destroyAllWindows()
 
-    height, width = img.shape
+        for template in self.template_imgs:
+            w, h = template.shape[::-1]     
+           
 
-    top_crop = int(height * 0.2)  # Top 20%
-    bottom_crop = int(height * 0.8)  # Bottom 80%
+            #template matching naming methods
+            methods = ['TM_CCOEFF_NORMED','TM_CCORR_NORMED']
+            flag = 0
 
-    # Cut the image in half vertically
-    img2 = img[top_crop:bottom_crop, : width // 3]
-    cv2.imshow('NEW', img2);cv2.waitKey();cv2.destroyAllWindows()
-    for meth in methods:
-        img = img2.copy()
-        method = getattr(cv2, meth)
-    
-        # Apply template Matching
-        res = cv2.matchTemplate(img,template,method)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+            for meth in methods:
+                img = img2.copy()
+                method = getattr(cv2, meth)
+            
+                # Apply template Matching
+                res = cv2.matchTemplate(img,template,method)
+                min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 
-        if max_val >= .8:
-            flag+=1
-            #draw_template_box(meth)
-            #return True
-        else:
-            print(meth, max_val)
-    print(flag)
-    return flag ==2
+                if max_val < .8:
+                    return False
+        return True
 
+def test2():
+    image1_path = "snow_inf_test_img\place_test1.PNG"
+    img1 = cv2.imread(image1_path, cv2.IMREAD_GRAYSCALE)
 
+    temp = imageSearch(img1)
 
+    image2_path = "snow_inf_test_img\place_test2.PNG"
+    img2 = cv2.imread(image2_path, cv2.IMREAD_GRAYSCALE)
 
+    temp2 = imageSearch(img2)
+    print(temp.in_image())
+    print(temp2.in_image())
 
+"""
 def test():
     images_dir = 'snow_inf_test_img'
     # Specific image paths
@@ -87,11 +104,9 @@ def test():
 
     upgrade_path = "snow_inf_test_img\\upgrade_img.PNG"
     first_path = "snow_inf_test_img\\first_img.PNG"
-    big_upgrade_path = "snow_inf_test_img\\big_upgrade_delete_template.PNG"
 
     upgrade_img = cv2.imread(upgrade_path, cv2.IMREAD_GRAYSCALE)
     first_img = cv2.imread(first_path, cv2.IMREAD_GRAYSCALE)
-    big_upgrade = cv2.imread(big_upgrade_path, cv2.IMREAD_GRAYSCALE)
 
     template_imgs = [upgrade_img, first_img]
     
@@ -102,4 +117,5 @@ def test():
     for img in invalid_images:
         for template in template_imgs:
             print(in_image(img,template))
-test()
+"""
+test2()
