@@ -30,7 +30,7 @@ def get_path(window, movement):
     red, _ = imageMask(red).largest_hill()
     cv2.imshow("red", red);cv2.waitKey();cv2.destroyAllWindows()
     return red
-    
+
 def optimal_rotation(window,movement):
     largest_count = 0
     direction = 0
@@ -51,7 +51,6 @@ def optimal_rotation(window,movement):
 
     for _ in range(direction):
         movement.rotate(.75)
-    #cv2.imshow("before", temp);cv2.waitKey();cv2.destroyAllWindows()       
 
 def main():
     window = WindowCapture('Roblox')

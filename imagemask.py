@@ -79,7 +79,47 @@ class imageMask:
         # looks better visually, bad in terms of speed i think
         return self.img, largest
 
+    def largest_island(self): # same function as above but different return value 
+        def isValidPixel(i,j):
+            return 0<=i < len(self.img) and 0<= j < len(self.img[0]) and self.img[i][j] == 255 and (i,j) not in seen
+        def find_hill_size(i,j):
+            stack = [(i,j)]
+            axis = [(1,0), (0,1), (-1,0), (0,-1)]
+            current_hill = []
+            while stack:
+                x,y = stack.pop()
+                for x_delta, y_delta in axis:
+                    r,c = x+x_delta, y+ y_delta
+                    if isValidPixel(r,c):
+                        stack.append([r,c])
+                        seen.add((r,c))
+                        current_hill.append((r,c))
+            return current_hill
+        def populate_arr(current_hill, temp):
+            for pixel_x, pixel_y in current_hill:
+                temp[pixel_x][pixel_y] = len(current_hill)
+            return temp
+        
+        def remove_islands(image, current_hill):
+            for x,y in current_hill:
+                image[x][y] = 0
+        seen = set()
+        temp = np.zeros((len(self.img), len(self.img[0])))
+        #255 = valid pixel
+        largest = []
+        for i in range(len(self.img)):
+            for j in range(len(self.img[0])):
+                if self.img[i][j] == 255 and (i,j) not in seen:
+                    current_hill = find_hill_size(i,j)
+                    if len(current_hill) > len(largest):
+                        largest = current_hill
 
+                        
+        
+        #right now this function updates the current image and deletes small clumps
+        #thinking of making array of large clumps (like a heap that points to clump to put unit on largest clump)
+        # looks better visually, bad in terms of speed i think
+        return largest
 
 
 def test():
