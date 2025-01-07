@@ -69,8 +69,8 @@ def find_largest_clumps(window, movement):
 
 
 
-    largest_red = red_objects.largest_island()
-    largest_green = green_objects.largest_island()
+    largest_red = imageMask(red_objects).largest_island()
+    largest_green = imageMask(green_objects).largest_island()
     return largest_red, largest_green
 
 def main():
