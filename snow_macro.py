@@ -73,6 +73,16 @@ def find_largest_clumps(window, movement):
     largest_green = imageMask(green_objects).largest_island()
     return largest_red, largest_green
 
+def euclidean_distance(red_cluster, green_cluster):
+    heap = []
+    for x1,y1 in green_cluster:
+        shortest_distance = float('inf')
+        for x2,y2 in red_cluster:
+            shortest_distance = min(shortest_distance, (y2-y1)**2+(x2-x1)**2)
+        heapq.heappush(heap, (shortest_distance, x1,y1))
+    return heap
+
+
 def main():
     window = WindowCapture('Roblox')
     movement = inputAutomation()
@@ -80,5 +90,6 @@ def main():
     optimal_rotation(window, movement)
     #path = get_path(window,movement)
     red_clump, green_clump = find_largest_clumps(window, movement)
+
 
 main()
