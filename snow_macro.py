@@ -4,6 +4,7 @@ from imagemask import imageMask
 from test_movement import inputAutomation
 import time
 import cv2
+import copy
 
 def get_before_after(window, movement):
     prev = imageMask(window.get_screenshot())
@@ -26,9 +27,9 @@ def get_path(window, movement):
     red_both(prev_red, post_red)
 
     red = imageMask.get_hills(prev_red,post_red)
-    cv2.imshow("red", red);cv2.waitKey();cv2.destroyAllWindows()
+    #cv2.imshow("red", red);cv2.waitKey();cv2.destroyAllWindows()
     red, _ = imageMask(red).largest_hill()
-    cv2.imshow("red", red);cv2.waitKey();cv2.destroyAllWindows()
+    #cv2.imshow("red", red);cv2.waitKey();cv2.destroyAllWindows()
     return red
 
 def optimal_rotation(window,movement):
@@ -52,10 +53,32 @@ def optimal_rotation(window,movement):
     for _ in range(direction):
         movement.rotate(.75)
 
+def find_largest_clumps(window, movement):
+    prev, post = get_before_after(window,movement)
+
+    prev_red, prev_green = copy.deepcopy(prev), copy.deepcopy(prev)
+    post_red, post_green = copy.deepcopy(post), copy.deepcopy(post)
+    green_both(prev_green, post_green)
+    red_both(prev_red, post_red)
+    
+    red_objects = imageMask.get_hills(prev_red, post_red)
+    green_objects = imageMask.get_hills(prev_green, post_green)
+    
+    cv2.imshow("red", red_objects);cv2.waitKey();cv2.destroyAllWindows()
+    cv2.imshow("green", green_objects);cv2.waitKey();cv2.destroyAllWindows()
+
+
+
+    largest_red = red_objects.largest_island()
+    largest_green = green_objects.largest_island()
+    return largest_red, largest_green
+
 def main():
     window = WindowCapture('Roblox')
     movement = inputAutomation()
     time.sleep(3)   
     optimal_rotation(window, movement)
-    path = get_path(window,movement)
+    #path = get_path(window,movement)
+    red_clump, green_clump = find_largest_clumps(window, movement)
+
 main()
