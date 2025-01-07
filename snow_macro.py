@@ -5,6 +5,7 @@ from test_movement import inputAutomation
 import time
 import cv2
 import copy
+import heapq
 
 def get_before_after(window, movement):
     prev = imageMask(window.get_screenshot())
@@ -63,9 +64,7 @@ def find_largest_clumps(window, movement):
     
     red_objects = imageMask.get_hills(prev_red, post_red)
     green_objects = imageMask.get_hills(prev_green, post_green)
-    
-    cv2.imshow("red", red_objects);cv2.waitKey();cv2.destroyAllWindows()
-    cv2.imshow("green", green_objects);cv2.waitKey();cv2.destroyAllWindows()
+    cv2.imshow("gree", green_objects);cv2.waitKey();cv2.destroyAllWindows()
 
 
 
@@ -75,14 +74,20 @@ def find_largest_clumps(window, movement):
 
 def euclidean_distance(red_cluster, green_cluster):
     heap = []
-    for x1,y1 in green_cluster:
+    for idx in range(0, len(green_cluster),100):
+        x1,y1 = green_cluster[idx]
         shortest_distance = float('inf')
         for x2,y2 in red_cluster:
             shortest_distance = min(shortest_distance, (y2-y1)**2+(x2-x1)**2)
-        heapq.heappush(heap, (shortest_distance, x1,y1))
+        heapq.heappush(heap, (shortest_distance, x1-10,y1-10))
+        if len(heap) > 100:
+            heapq.heappop(heap)
     return heap
 
-
+def temp(movement):
+    movement.press_key('1')
+    time.sleep(.5)
+    movement.click('left')
 def main():
     window = WindowCapture('Roblox')
     movement = inputAutomation()
@@ -91,5 +96,14 @@ def main():
     #path = get_path(window,movement)
     red_clump, green_clump = find_largest_clumps(window, movement)
 
-
+    print(green_clump)
+    print('start')
+    
+    closest_pixels = euclidean_distance(red_clump, green_clump)
+    print('end')
+    for i in range(20):
+        distance, x,y = heapq.heappop(closest_pixels)
+        movement.move_to(x,y)
+        temp(movement)
+        time.sleep(2)
 main()
