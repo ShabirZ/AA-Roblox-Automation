@@ -64,17 +64,16 @@ def find_largest_clumps(window, movement):
     
     red_objects = imageMask.get_hills(prev_red, post_red)
     green_objects = imageMask.get_hills(prev_green, post_green)
-    cv2.imshow("gree", green_objects);cv2.waitKey();cv2.destroyAllWindows()
-
-
-
+    cv2.imshow("green", green_objects);cv2.waitKey();cv2.destroyAllWindows()
+    h,w = green_objects.shape
+    print(h,w)
     largest_red = imageMask(red_objects).largest_island()
     largest_green = imageMask(green_objects).largest_island()
     return largest_red, largest_green
 
 def collapse_1D(cluster, color):
     pixel_map = {}
-    for x,y in cluster:
+    for y,x in cluster:
         if x not in pixel_map:
             pixel_map[x] = y
         
@@ -96,6 +95,25 @@ def euclidean_distance(red_cluster, green_cluster):
             heapq.heappop(heap)
     return heap
 
+def place_units(red_clump, green_clump, movement, window):
+    OneD_red = collapse_1D(red_clump, 'Red')
+    OneD_green = collapse_1D(green_clump, 'Green')
+    print(window.w, window.h)
+    
+    for _ in range(190):
+        seen = set()
+        for x,y in OneD_green.items():
+            if x//100 in seen:
+                continue
+            seen.add(x//100)
+            new_x, new_y = window.get_screen_position((x,y))
+            movement.move_to(new_x, new_y-30)
+            movement.press_key('1')
+            time.sleep(.5)
+            movement.click('left')
+            OneD_green[x] -=30
+
+
 def temp(movement):
     movement.press_key('1')
     time.sleep(.5)
@@ -107,7 +125,8 @@ def main():
     optimal_rotation(window, movement)
     #path = get_path(window,movement)
     red_clump, green_clump = find_largest_clumps(window, movement)
-    
+
+    place_units(red_clump, green_clump, movement, window)
     """
     print('start')
     
