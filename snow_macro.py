@@ -72,6 +72,18 @@ def find_largest_clumps(window, movement):
     largest_green = imageMask(green_objects).largest_island()
     return largest_red, largest_green
 
+def collapse_1D(cluster, color):
+    pixel_map = {}
+    for x,y in cluster:
+        if x not in pixel_map:
+            pixel_map[x] = y
+        
+        if color == 'Green':
+            pixel_map[x] = max(y, pixel_map[x])
+        elif color == 'Red':
+            pixel_map[x] = min(y, pixel_map[x])
+    return pixel_map
+
 def euclidean_distance(red_cluster, green_cluster):
     heap = []
     for idx in range(0, len(green_cluster),100):
@@ -95,8 +107,8 @@ def main():
     optimal_rotation(window, movement)
     #path = get_path(window,movement)
     red_clump, green_clump = find_largest_clumps(window, movement)
-
-    print(green_clump)
+    
+    """
     print('start')
     
     closest_pixels = euclidean_distance(red_clump, green_clump)
@@ -106,4 +118,5 @@ def main():
         movement.move_to(x,y)
         temp(movement)
         time.sleep(2)
+    """
 main()
