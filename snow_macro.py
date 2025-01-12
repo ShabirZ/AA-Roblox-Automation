@@ -64,6 +64,7 @@ def find_largest_clumps(window, movement):
     
     red_objects = imageMask.get_hills(prev_red, post_red)
     green_objects = imageMask.get_hills(prev_green, post_green)
+    #cv2.imshow("red", green_objects);cv2.waitKey();cv2.destroyAllWindows()
 
     largest_red = imageMask(red_objects).largest_island()
     largest_green = imageMask(green_objects).largest_island()
@@ -98,6 +99,7 @@ def place_units(red_clump, green_clump, movement, window):
             time.sleep(.5)
             movement.click('left')
             OneD_green[x] -=30
+            time.sleep(1)
 
 
 def temp(movement):
