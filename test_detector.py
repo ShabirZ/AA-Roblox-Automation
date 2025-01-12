@@ -4,7 +4,7 @@ from pathlib import Path
 import cv2
 
 # Load YOLOv8 model
-model_path = "AA_object_detector.pt"
+model_path = "AA_object_detector_v2.pt"
 model = YOLO(model_path)
 
 # Paths

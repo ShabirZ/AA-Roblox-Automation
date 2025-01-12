@@ -4,7 +4,7 @@ import keyboard
 
 # Function to take a screenshot and save it
 def take_screenshot(count):
-    filename = f"screenshot_{count}.png"
+    filename = f"screenshot2_{count}.png"
     screenshot = ImageGrab.grab()
     screenshot.save(filename)
     print(f"Saved {filename}")
