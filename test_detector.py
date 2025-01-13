@@ -4,11 +4,11 @@ from pathlib import Path
 import cv2
 
 # Load YOLOv8 model
-model_path = "AA_object_detector_v2.pt"
+model_path = "AAObjectDetectorV3.pt"
 model = YOLO(model_path)
 
 # Paths
-test_folder = Path("test_detection_imgs")
+test_folder = Path("test_imgs_V3")
 output_folder = test_folder.parent / "detections"
 
 # Create output folder if it doesn't exist
