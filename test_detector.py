@@ -23,10 +23,15 @@ for image_file in test_folder.iterdir():
         print(f"Processing: {image_file.name}")
 
         # Run detection
-        results = model.predict(source=str(image_file), save=True, save_txt=False, save_conf=False)
+        results = model.predict(source=str(image_file), save=False, save_txt=False, save_conf=True)
 
         # Save detected images
         for result in results:
+            boxes = result.boxes
+            print(boxes)
+            for label in boxes.cls:
+                print(int(label), "BOX LABEL")
+            continue
             # `result.plot()` creates an image with detections
             detected_img = result.plot()
 
