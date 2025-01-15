@@ -2,6 +2,7 @@ from windowcapture import WindowCapture
 from template_match import imageSearch
 from imagemask import imageMask
 from test_movement import inputAutomation
+from objectdetector import objectDetector
 import time
 import cv2
 import copy
@@ -82,11 +83,12 @@ def collapse_1D(cluster, color):
             pixel_map[x] = min(y, pixel_map[x])
     return pixel_map
 
-def place_units(red_clump, green_clump, movement, window):
+def place_units(red_clump, green_clump, movement, window, object_detector):
     OneD_red = collapse_1D(red_clump, 'Red')
     OneD_green = collapse_1D(green_clump, 'Green')
     print(window.w, window.h)
-    
+    unit_cords = []
+    a = 3
     for _ in range(190):
         seen = set()
         for x,y in OneD_green.items():
@@ -98,9 +100,23 @@ def place_units(red_clump, green_clump, movement, window):
             movement.press_key('1')
             time.sleep(.5)
             movement.click('left')
+
+            current_screen = window.get_screenshot()
+            labels = object_detector.detect(current_screen)
+            time.sleep(1)
+            for label in labels:
+                if label == 3:
+                    movement.press_key('q')
+
+                    unit_cords.append((x,y))
+                    movement.move_to(100,100)
+                    movement.click('left')
+                    a-=1
+                    if a ==0:
+                        return unit_cords
             OneD_green[x] -=30
             time.sleep(1)
-
+    return unit_cords
 
 def temp(movement):
     movement.press_key('1')
@@ -109,11 +125,15 @@ def temp(movement):
 def main():
     window = WindowCapture('Roblox')
     movement = inputAutomation()
+    object_detector = objectDetector()
     time.sleep(3)   
     optimal_rotation(window, movement)
     #path = get_path(window,movement)
     red_clump, green_clump = find_largest_clumps(window, movement)
 
-    place_units(red_clump, green_clump, movement, window)
-    
+    unit_cords = place_units(red_clump, green_clump, movement, window, object_detector)
+    time.sleep(2)
+    for x,y in unit_cords:
+        movement.move_to(x,y)
+
 main()

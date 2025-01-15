@@ -6,7 +6,7 @@ import cv2
 # Load YOLOv8 model
 model_path = "AAObjectDetectorV3.pt"
 model = YOLO(model_path)
-
+print(model.names)
 # Paths
 test_folder = Path("test_imgs_V3")
 output_folder = test_folder.parent / "detections"
@@ -28,7 +28,7 @@ for image_file in test_folder.iterdir():
         # Save detected images
         for result in results:
             boxes = result.boxes
-            print(boxes)
+            print(boxes.conf)
             for label in boxes.cls:
                 print(int(label), "BOX LABEL")
             continue
@@ -39,5 +39,5 @@ for image_file in test_folder.iterdir():
             detection_save_path = output_folder / image_file.name
             cv2.imwrite(str(detection_save_path), detected_img)
             print(f"Saved detection: {detection_save_path}")
-
+            
 print("Detection completed!")
