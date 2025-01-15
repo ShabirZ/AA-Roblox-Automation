@@ -8,6 +8,7 @@ import cv2
 import copy
 import heapq
 
+
 def get_before_after(window, movement):
     prev = imageMask(window.get_screenshot())
     movement.press_key('1')
@@ -82,11 +83,12 @@ def collapse_1D(cluster, color):
         elif color == 'Red':
             pixel_map[x] = min(y, pixel_map[x])
     return pixel_map
-
+def detect_window(current_screen, object_detector):
+    labels = object_detector.detect(current_screen)
+    return labels
 def place_units(red_clump, green_clump, movement, window, object_detector):
     OneD_red = collapse_1D(red_clump, 'Red')
     OneD_green = collapse_1D(green_clump, 'Green')
-    print(window.w, window.h)
     unit_cords = []
     a = 3
     for _ in range(190):
@@ -98,17 +100,17 @@ def place_units(red_clump, green_clump, movement, window, object_detector):
             new_x, new_y = window.get_screen_position((x,y))
             movement.move_to(new_x, new_y-30)
             movement.press_key('1')
-            time.sleep(.5)
+            time.sleep(.2)
             movement.click('left')
-
+            time.sleep(.5)
             current_screen = window.get_screenshot()
-            labels = object_detector.detect(current_screen)
-            time.sleep(1)
+            labels = detect_window(current_screen, object_detector)
+            
             for label in labels:
                 if label == 3:
                     movement.press_key('q')
 
-                    unit_cords.append((x,y))
+                    unit_cords.append((new_x, new_y-30))
                     movement.move_to(100,100)
                     movement.click('left')
                     a-=1
@@ -135,5 +137,6 @@ def main():
     time.sleep(2)
     for x,y in unit_cords:
         movement.move_to(x,y)
+        time.sleep(5)
 
-main()
+(main())
