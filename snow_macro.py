@@ -90,7 +90,8 @@ def place_units(red_clump, green_clump, movement, window, object_detector):
     OneD_red = collapse_1D(red_clump, 'Red')
     OneD_green = collapse_1D(green_clump, 'Green')
     unit_cords = []
-    a = 3
+    placement_count = [ ['1', 3], ['6', 5]]
+    curr_idx = 0
     for _ in range(190):
         seen = set()
         for x,y in OneD_green.items():
@@ -99,7 +100,7 @@ def place_units(red_clump, green_clump, movement, window, object_detector):
             seen.add(x//100)
             new_x, new_y = window.get_screen_position((x,y))
             movement.move_to(new_x, new_y-30)
-            movement.press_key('1')
+            movement.press_key(placement_count[curr_idx][0])
             time.sleep(.2)
             movement.click('left')
             time.sleep(.5)
@@ -113,8 +114,10 @@ def place_units(red_clump, green_clump, movement, window, object_detector):
                     unit_cords.append((new_x, new_y-30))
                     movement.move_to(100,100)
                     movement.click('left')
-                    a-=1
-                    if a ==0:
+                    placement_count[curr_idx][1]-=1
+                    if placement_count[curr_idx][1] == 0:
+                        curr_idx+=1
+                    if curr_idx >= len(placement_count):
                         return unit_cords
             OneD_green[x] -=30
             time.sleep(1)
