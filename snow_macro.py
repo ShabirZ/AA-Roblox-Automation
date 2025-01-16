@@ -7,7 +7,7 @@ import time
 import cv2
 import copy
 import heapq
-
+import random
 
 def get_before_after(window, movement):
     prev = imageMask(window.get_screenshot())
@@ -83,44 +83,71 @@ def collapse_1D(cluster, color):
         elif color == 'Red':
             pixel_map[x] = min(y, pixel_map[x])
     return pixel_map
-def detect_window(current_screen, object_detector):
-    labels = object_detector.detect(current_screen)
-    return labels
-def place_units(red_clump, green_clump, movement, window, object_detector):
+
+
+
+
+
+def place_unit(red_clump, green_clump, movement, window, object_detector):
+    def isPlacement():
+        img = window.get_screenshot()
+        label = object_detector.detect(img)
+        print(label)
+        for val in label:
+            if val == 3:
+                return True
+
+    def clear_ui():
+        movement.press_key('q')
+        movement.move_to(100,100)
+        movement.click('left')
+
+    def try_place(key, x,y):
+        movement.press_key(key)
+        time.sleep(.05)
+        movement.move_to(x,y)
+        time.sleep(.1)
+        movement.click('left')
+        time.sleep(.5)
+
+    def place_non_hill(key, placement_count):
+        # x = 1920  y = 1080
+    
+        while placement_count:
+            x = random.randint(600, 1200)
+            y = random.randint(600, 1000)
+            try_place(key,x,y)
+            if isPlacement:
+                clear_ui()
+                unit_cords.append((x,y))
+                placement_count-=1
+    def place_hill(key, placement_count):
+       
+        while placement_count !=0:  
+            seen = set()
+            for x,y in OneD_green.items():
+                if x//100 in seen:
+                    continue
+                seen.add(x//100)
+                new_x, new_y = window.get_screen_position((x,y))
+                try_place(key,new_x,new_y)
+                time.sleep(.5)
+                if isPlacement():
+                    clear_ui()
+                    unit_cords.append((x,y))
+                    placement_count-=1
+                OneD_green[x]-=50
+        
+        return unit_cords
     OneD_red = collapse_1D(red_clump, 'Red')
     OneD_green = collapse_1D(green_clump, 'Green')
     unit_cords = []
-    placement_count = [ ['1', 3], ['6', 5]]
-    curr_idx = 0
-    for _ in range(190):
-        seen = set()
-        for x,y in OneD_green.items():
-            if x//100 in seen:
-                continue
-            seen.add(x//100)
-            new_x, new_y = window.get_screen_position((x,y))
-            movement.move_to(new_x, new_y-30)
-            movement.press_key(placement_count[curr_idx][0])
-            time.sleep(.2)
-            movement.click('left')
-            time.sleep(.5)
-            current_screen = window.get_screenshot()
-            labels = detect_window(current_screen, object_detector)
-            
-            for label in labels:
-                if label == 3:
-                    movement.press_key('q')
-
-                    unit_cords.append((new_x, new_y-30))
-                    movement.move_to(100,100)
-                    movement.click('left')
-                    placement_count[curr_idx][1]-=1
-                    if placement_count[curr_idx][1] == 0:
-                        curr_idx+=1
-                    if curr_idx >= len(placement_count):
-                        return unit_cords
-            OneD_green[x] -=30
-            time.sleep(1)
+    placement_data = [ ['1', 3, True], ['6', 5, True]]
+    for unit,placement_count, is_hill in placement_data:
+        if is_hill:
+            place_hill(unit, placement_count)
+        else:
+            place_non_hill(unit, placement_coutn)
     return unit_cords
 
 def temp(movement):
@@ -136,7 +163,7 @@ def main():
     #path = get_path(window,movement)
     red_clump, green_clump = find_largest_clumps(window, movement)
 
-    unit_cords = place_units(red_clump, green_clump, movement, window, object_detector)
+    unit_cords = place_unit(red_clump, green_clump, movement, window, object_detector)
     time.sleep(2)
     for x,y in unit_cords:
         movement.move_to(x,y)
